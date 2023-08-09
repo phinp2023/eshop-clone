@@ -1,0 +1,22 @@
+{
+  "name": "eshop-clone",
+  "version": "1.0.0",
+  "description": "backend clone from eshop",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phinp2023/eshop-clone.git"
+  },
+  "keywords": [
+    "eshop"
+  ],
+  "author": "Phi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/phinp2023/eshop-clone/issues"
+  },
+  "homepage": "https://github.com/phinp2023/eshop-clone#readme"
+}
