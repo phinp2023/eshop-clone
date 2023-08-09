@@ -1,22 +1,32 @@
 {
-  "name": "eshop-clone",
+  "name": "kshop-clone",
   "version": "1.0.0",
-  "description": "backend clone from eshop",
+  "description": "backend clone from kshop",
   "main": "server.js",
   "scripts": {
+    "start": "nodemon --inspect server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/phinp2023/eshop-clone.git"
+    "url": "git+https://github.com/phinp2023/kshop-clone.git"
   },
   "keywords": [
-    "eshop"
+    "kshop"
   ],
   "author": "Phi",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/phinp2023/eshop-clone/issues"
+    "url": "https://github.com/phinp2023/kshop-clone/issues"
   },
-  "homepage": "https://github.com/phinp2023/eshop-clone#readme"
+  "homepage": "https://github.com/phinp2023/kshop-clone#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.4.2"
+  },
+  "devDependencies": {
+    "dotenv": "^16.3.1",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.0.1"
+  }
 }
