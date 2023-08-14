@@ -20,14 +20,16 @@ const userSchema = new Schema(
             select: false,
         },
         phoneNumber: String,
-        address: {
-            country: String,
-            city: String,
-            address1: String,
-            address2: String,
-            zipCode: Number,
-            addressType: String,
-        },
+        addresses: [
+            {
+                country: String,
+                city: String,
+                address1: String,
+                address2: String,
+                zipCode: Number,
+                addressType: String,
+            },
+        ],
         role: {
             type: 'String',
             default: 'user',

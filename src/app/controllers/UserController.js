@@ -128,7 +128,7 @@ class UserController {
                 return next(new ErrorHandler("User doesn't exists!", 400));
             }
 
-            res.status(201).json({
+            res.status(200).json({
                 success: true,
                 user,
             });
@@ -157,9 +157,35 @@ class UserController {
 
     async updateUserInfo(req, res, next) {
         try {
-            res.json({
+            const { email, password, phoneNumber, name } = req.body;
+
+            const user = await User.findOne({ email }).select('+password');
+
+            if (!user) {
+                return next(new ErrorHandler('User not found!', 400));
+            }
+
+            const isPasswordValid = await user.comparePassword(password);
+
+            if (!isPasswordValid) {
+                return next(
+                    new ErrorHandler(
+                        'Please provide the correct information!',
+                        400
+                    )
+                );
+            }
+
+            user.name = name;
+            user.email = email;
+            user.phoneNumber = phoneNumber;
+
+            await user.save();
+
+            res.status(201).json({
                 success: true,
-                message: 'Update user successful!',
+                message: 'Update information successful!',
+                user,
             });
         } catch (error) {
             return next(new ErrorHandler(error.message, 500));
@@ -168,17 +194,188 @@ class UserController {
 
     // [PUT] /user/update-avatar
 
+    async updateAvatar(req, res, next) {
+        try {
+            const existsUser = await User.findById(req.user.id);
+
+            const existAvatarPath = `src/uploads/${existsUser.avatar}`;
+
+            fs.unlinkSync(existAvatarPath);
+
+            const fileUrl = path.join(req.file.filename);
+
+            const user = await User.findByIdAndUpdate(req.user.id, {
+                avatar: fileUrl,
+            });
+
+            res.status(200).json({
+                success: true,
+                message: 'Update avatar successful!',
+                user,
+            });
+        } catch (error) {
+            return next(new ErrorHandler(error.message, 500));
+        }
+    }
+
     // [PUT] /user/update-user-addresses
+
+    async updateUserAddress(req, res, next) {
+        try {
+            const user = await User.findById(req.user.id);
+
+            const sameTypeAddress = user.addresses.find(
+                (address) => address.addressType === req.body.addressType
+            );
+
+            if (sameTypeAddress) {
+                return next(
+                    new ErrorHandler(
+                        `${req.body.addressType} address already exists`
+                    )
+                );
+            }
+
+            const existAddress = user.addresses.find(
+                (address) => address._id === req.body._id
+            );
+
+            if (existAddress) {
+                Object.assign(existAddress, req.body);
+            } else {
+                user.addresses.push(req.body);
+            }
+
+            await user.save();
+
+            res.status(200).json({
+                success: true,
+                message: 'Update information successful!',
+                user,
+            });
+        } catch (error) {
+            return next(new ErrorHandler(error.message, 500));
+        }
+    }
 
     // [DELETE] /user/delete-user-address/:id
 
+    async deleteUserAddress(req, res, next) {
+        try {
+            const { _id: userId } = req.user;
+            const { id: addressId } = req.params;
+
+            const user = await User.findOneAndUpdate(
+                { _id: userId },
+                {
+                    $pull: {
+                        addresses: { _id: addressId },
+                    },
+                },
+                {
+                    new: true,
+                }
+            );
+
+            res.status(200).json({
+                success: true,
+                message: 'Delete address successful!',
+                user,
+            });
+        } catch (error) {
+            return next(new ErrorHandler(error.message, 500));
+        }
+    }
+
     // [PUT] /user/update-user-password
+
+    async updateUserPassword(req, res, next) {
+        try {
+            const { oldPassword, newPassword, confirmPassword } = req.body;
+
+            if (newPassword !== confirmPassword) {
+                return next(
+                    new ErrorHandler(
+                        `Password doesn't matched with each other!`,
+                        400
+                    )
+                );
+            }
+
+            const user = await User.findById(req.user._id).select('+password');
+
+            const isPasswordMatched = await user.comparePassword(oldPassword);
+
+            if (!isPasswordMatched) {
+                return next(
+                    new ErrorHandler('Old password is incorrect!', 400)
+                );
+            }
+
+            user.password = newPassword;
+
+            await user.save();
+
+            res.status(200).json({
+                success: true,
+                message: 'Password updated successfully!',
+            });
+        } catch (error) {
+            return next(new ErrorHandler(error.message, 500));
+        }
+    }
 
     // [GET] /user/user-info/:id
 
+    async getUserInfo(req, res, next) {
+        try {
+            const user = await User.findById(req.params.id);
+
+            res.status(201).json({
+                success: true,
+                user,
+            });
+        } catch (error) {
+            return next(new ErrorHandler(error.message, 500));
+        }
+    }
+
     // [GET] /user/admin-all-users
 
+    async getAllUsers(req, res, next) {
+        try {
+            const users = await User.find().sort({ createdAt: -1 });
+
+            res.status(201).json({
+                success: true,
+                users,
+            });
+        } catch (error) {
+            return next(new ErrorHandler(error.message, 500));
+        }
+    }
+
     // [DELETE] /user/delete-user/:id
+    async deleteUser(req, res, next) {
+        try {
+            const user = await User.findById(req.params.id);
+
+            if (!user) {
+                return next(
+                    new ErrorHandler('User is not available with this id', 400)
+                );
+            }
+
+            await User.findByIdAndDelete(req.params.id);
+
+            res.status(201).json({
+                success: true,
+                message: 'User deleted successfully!',
+            });
+        } catch (error) {
+            return next(new ErrorHandler(error.message, 500));
+        }
+    }
 }
 
 module.exports = new UserController();

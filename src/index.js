@@ -2,6 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
+const morgan = require('morgan');
 
 const connectDatabase = require('./db');
 const route = require('./routes');
@@ -14,6 +15,9 @@ app.use('/', express.static(path.join(__dirname, 'uploads')));
 
 // Using cors
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+
+// Logger
+app.use(morgan('tiny'));
 
 // Add cookie
 app.use(cookieParser());
