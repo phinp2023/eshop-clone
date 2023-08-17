@@ -1,8 +1,8 @@
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 const Shop = require('../models/shop');
-const path = require('path');
 const ErrorHandler = require('../../utils/ErrorHandler');
 const { createActivationToken, sendToken } = require('../../utils/Token');
 const { sendMail } = require('../../utils/Mail');
